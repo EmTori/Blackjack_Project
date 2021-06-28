@@ -4,7 +4,7 @@ def loadCardDeck():
     with open("Card_Deck.csv", "r", newline = "") as file:
         reader = csv.reader(file)
         for row in reader:
-            item = [row[0], row[1]]
+            item = [row[0], row[1], row[2]]
             cardDeck.append(item)
     return cardDeck
 
@@ -17,7 +17,19 @@ def main():
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
 
-    cardDeck = loadCardDeck()
+    again = "y"
+    while again == "y":
+        money = 100.0
+
+        cardDeck = loadCardDeck()
+
+        print(cardDeck)
+        print("Money: ", money)
+
+        again = input("Play again? (y/n): ")
+
+    print("Come back soon!")
+    print("Bye!")
 
 
 
