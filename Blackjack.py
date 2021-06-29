@@ -19,7 +19,6 @@ def main():
 
     again = "y"
     while again == "y":
-        money = 100.0
 
         cardDeck = loadCardDeck()
 
@@ -27,12 +26,9 @@ def main():
         print("Money: ", money)
 
         again = input("Play again? (y/n): ")
-
+    
     print("Come back soon!")
     print("Bye!")
-
-
-
 
 if __name__ == "__main__":
     main()
