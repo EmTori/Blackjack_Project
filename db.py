@@ -1,18 +1,46 @@
+#!/usr/bin/env python3
+
 import csv
+import sys
 
+MONEY_FILE = "money.txt"
+
+#Function will exit the program
+def exitProgram():
+    print("Exiting program.")
+    print()
+    print("Bye!")
+    sys.exit()
+
+#Load money file
 def loadMoney():
-    playersMoney = []
-    with open("money.txt", "r", newline = "") as file:
-        reader = csv.reader(file)
-        for row in reader:
-            item = [row[0]]
-            playersMoney.append(item)
-    return playersMoney
+    try:
+        playersMoney = []
+        with open("money.txt", "r", newline = "") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                item = [row[0]]
+                playersMoney.append(item)
+        return playersMoney
+    except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
+        print("Could not find file: " +MONEY_FILE+ "!")
+        exitProgram()
+    except Exception as e:                                    #Exception error will end the program
+        print(type(e), e)
+        exitProgram()
 
+#Save money file
 def saveMoney(playersMoney):
-    with open("money.txt", "w", newline = "") as file:
-        writer = csv.writer(file)
-        writer.writerows(playersMoney)
+    try:
+        with open("money.txt", "w", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerows(playersMoney)
+    except OSError as e:                                      #OS error will end the program
+        print(type(e), e)
+        exitProgram()
+    except Exception as e:                                    #Exception error will end the program
+        print(type(e), e)
+        exitProgram()
         
 def main():
 

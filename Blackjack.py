@@ -14,7 +14,7 @@ DEALERS_SCORE = 0
 PLAYERS_SCORE = 0
 
 #Exits program if something fails
-def exit_program():
+def exitProgram():
     print("Exiting program.")
     print()
     print("Bye!")
@@ -37,7 +37,7 @@ def loadDealersHand():
         return dealersHand
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Saves the dealers hand file
 def saveDealersHand(dealersHand):
@@ -47,10 +47,10 @@ def saveDealersHand(dealersHand):
             writer.writerows(dealersHand)
     except OSError as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Loads the Player hand file
 def loadPlayersHand():
@@ -69,7 +69,7 @@ def loadPlayersHand():
         return playersHand
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Saves the Player hand file
 def savePlayersHand(playersHand):
@@ -79,10 +79,10 @@ def savePlayersHand(playersHand):
             writer.writerows(playersHand)
     except OSError as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Loads the deck of cards file
 def loadCardDeck():
@@ -96,10 +96,10 @@ def loadCardDeck():
         return cardDeck
     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
         print("Could not find file: " +DECK_FILENAME+ "!")
-        exit_program()
+        exitProgram()
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Saves the deck of cards file
 def saveCardDeck(cardDeck):
@@ -109,10 +109,10 @@ def saveCardDeck(cardDeck):
             writer.writerows(cardDeck)
     except OSError as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
     except Exception as e:
         print(type(e), e)
-        exit_program()
+        exitProgram()
 
 #Adds a new card to the dealers hand
 def dealersCards(cardDeck, dealersHand, DEALERS_SCORE):
