@@ -4,6 +4,8 @@ import csv
 import random
 import sys
 
+import db
+
 #File names in the current directory
 DECK_FILENAME = "Card_Deck.csv"
 DEALERS_HAND_FILENAME = "Dealers_Hand.csv"
@@ -35,7 +37,7 @@ def loadDealersHand():
         print("Starting a new empty file...")
         print()
         return dealersHand
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -45,10 +47,10 @@ def saveDealersHand(dealersHand):
         with open(DEALERS_HAND_FILENAME, "w", newline = "") as file:
             writer = csv.writer(file)
             writer.writerows(dealersHand)
-    except OSError as e:
+    except OSError as e:                                      #OS error will end the program
         print(type(e), e)
         exitProgram()
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -67,7 +69,7 @@ def loadPlayersHand():
         print("Starting a new empty file...")
         print()
         return playersHand
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -77,10 +79,10 @@ def savePlayersHand(playersHand):
         with open(PLAYERS_HAND_FILENAME, "w", newline = "") as file:
             writer = csv.writer(file)
             writer.writerows(playersHand)
-    except OSError as e:
+    except OSError as e:                                      #OS error will end the program
         print(type(e), e)
         exitProgram()
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -97,7 +99,7 @@ def loadCardDeck():
     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
         print("Could not find file: " +DECK_FILENAME+ "!")
         exitProgram()
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -107,10 +109,10 @@ def saveCardDeck(cardDeck):
         with open(DECK_FILENAME, "w", newline = "") as file:
             writer = csv.writer(file)
             writer.writerows(cardDeck)
-    except OSError as e:
+    except OSError as e:                                      #OS error will end the program
         print(type(e), e)
         exitProgram()
-    except Exception as e:
+    except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
@@ -146,21 +148,46 @@ def showDealersHand(dealersHand):
         print(cards[0], cards[1])
     print()
 
+def playerBet(playersMoney):
+    playersMoney = float(playersMoney[0][0])
+    print("Money: " + str(playersMoney))
+    while True:
+        betAmount = int(input("Bet amount: "))
+
+        if betAmount < 5 and betAmount > 1000:
+            print("Bet amount cannot be less than 5 and greater than 1000.")
+            continue
+
+        elif betAmount > playersMoney:
+            print("You cannot bet more money than you have available.")
+            continue
+        
+        else:
+            playersMoney -= betAmount
+            db.saveMoney(playersMoney)
+            print("Money: " + str(playersMoney))
+            break
+
 #The game name and introduction
 def gameName():
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
     print()
 
+#Main function
 def main():
     gameName()
 
     cardDeck = loadCardDeck()
     dealersHand = loadDealersHand()
     playersHand = loadPlayersHand()
+    playersMoney = db.loadMoney()
 
     again = "y"
     while again == "y":
+
+        playerBet(playersMoney)
+
         dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
         
         playersCards(cardDeck, playersHand, PLAYERS_SCORE)
