@@ -9,6 +9,9 @@ DECK_FILENAME = "Card_Deck.csv"
 DEALERS_HAND_FILENAME = "Dealers_Hand.csv"
 PLAYERS_HAND_FILENAME = "Players_Hand.csv"
 
+DEALERS_SCORE = 0
+PLAYERS_SCORE = 0
+
 #Exits program if something fails
 def exit_program():
     print("Exiting program.")
@@ -112,12 +115,15 @@ def saveCardDeck(cardDeck):
 
 def dealersCards(cardDeck, dealersHand):
     randomCard = random.randint(0, len(cardDeck)-1)
-    card = cardDeck[randomCard]
-    dealersHand.append(card)              #Add the random card to dealers hand
-    cardDeck.remove(card)                 #Remove the random card from the card deck
-    saveDealersHand(dealersHand)          #Save dealers hand
-    saveCardDeck(cardDeck)                #Save card deck
-    print(card[0], card[1])
+    firstCard = cardDeck[randomCard]
+    dealersHand.append(firstCard)
+    cardDeck.remove(firstCard)
+    secondCard = cardDeck[randomCard]
+    dealersHand.append(secondCard)
+    cardDeck.remove(secondCard)
+    saveDealersHand(dealersHand)
+    saveCardDeck(cardDeck)
+    print(firstCard[0], firstCard[1])
     print()
 
 def playersCards(cardDeck, playersHand):
@@ -153,10 +159,20 @@ def main():
         print("YOUR CARDS: ")
         playersCards(cardDeck, playersHand)
 
+        while True:
+            playerChoice = input("Hit or stand? (hit/stand): ")
+            if playerChoice == "hit":
+                break
+
+            elif playerChoice == "stand":
+                break
+
+            else:
+                print("Please enter a proper command.")
+                continue
 
         again = input("Play again? (y/n): ")
 
-    
     print()
     print("Come back soon!")
     print("Bye!")
