@@ -113,14 +113,27 @@ def saveCardDeck(cardDeck):
 def dealersCards(cardDeck, dealersHand):
     randomCard = random.randint(0, len(cardDeck)-1)
     card = cardDeck[randomCard]
-    dealersHand.append(card)
-    cardDeck.remove(card)
-    saveDealersHand(dealersHand)
-    saveCardDeck(cardDeck)
+    dealersHand.append(card)              #Add the random card to dealers hand
+    cardDeck.remove(card)                 #Remove the random card from the card deck
+    saveDealersHand(dealersHand)          #Save dealers hand
+    saveCardDeck(cardDeck)                #Save card deck
     print(card[0], card[1])
+    print()
 
-def playersCards():
-    pass
+def playersCards(cardDeck, playersHand):
+    randomCard = random.randint(0, len(cardDeck)-1)
+    firstCard = cardDeck[randomCard]
+    playersHand.append(firstCard)
+    cardDeck.remove(firstCard)
+    secondCard = cardDeck[randomCard]
+    playersHand.append(secondCard)
+    cardDeck.remove(secondCard)
+    savePlayersHand(playersHand)
+    saveCardDeck(cardDeck)
+    print(firstCard[0], firstCard[1])
+    print(secondCard[0], secondCard[1])
+    print()
+
 
 def main():
     print("BLACKJACK!")
@@ -136,6 +149,9 @@ def main():
 
         print("DEALER'S SHOW CARD: ")
         dealersCards(cardDeck, dealersHand)
+
+        print("YOUR CARDS: ")
+        playersCards(cardDeck, playersHand)
 
 
         again = input("Play again? (y/n): ")
