@@ -9,6 +9,7 @@ DECK_FILENAME = "Card_Deck.csv"
 DEALERS_HAND_FILENAME = "Dealers_Hand.csv"
 PLAYERS_HAND_FILENAME = "Players_Hand.csv"
 
+#Game score
 DEALERS_SCORE = 0
 PLAYERS_SCORE = 0
 
@@ -29,7 +30,7 @@ def loadDealersHand():
                 card = [row[0], row[1]]
                 dealersHand.append(card)
         return dealersHand
-    except FileNotFoundError as e:            #If the program cant find the dealers hand file it will creat a new, empty, file
+    except FileNotFoundError as e:                            #If the program cant find the dealers hand file it will creat a new one
         print("Could not find file: " +DEALERS_HAND_FILENAME+ "!")
         print("Starting a new empty file...")
         print()
@@ -61,7 +62,7 @@ def loadPlayersHand():
                 card = [row[0], row[1]]
                 playersHand.append(card)
         return playersHand
-    except FileNotFoundError as e:            #If the program cant find the players hand file it will creat a new, empty, file
+    except FileNotFoundError as e:                            #If the program cant find the players hand file it will creat a new one
         print("Could not find file: " +PLAYERS_HAND_FILENAME+ "!")
         print("Starting a new empty file...")
         print()
@@ -93,7 +94,7 @@ def loadCardDeck():
                 card = [row[0], row[1], row[2]]
                 cardDeck.append(card)
         return cardDeck
-    except FileNotFoundError as e:            #If the program cant find the card deck file it will end the program
+    except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
         print("Could not find file: " +DECK_FILENAME+ "!")
         exit_program()
     except Exception as e:
@@ -113,38 +114,46 @@ def saveCardDeck(cardDeck):
         print(type(e), e)
         exit_program()
 
-def dealersCards(cardDeck, dealersHand):
-    randomCard = random.randint(0, len(cardDeck)-1)
+#Adds a new card to the dealers hand
+def dealersCards(cardDeck, dealersHand, DEALERS_SCORE):
+    randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
     card = cardDeck[randomCard]
-    dealersHand.append(card)
-    cardDeck.remove(card)
+    dealersHand.append(card)                                  #Adds the random card to the dealers hand
+    cardDeck.remove(card)                                     #Removes the random card from the card deck
     saveDealersHand(dealersHand)
     saveCardDeck(cardDeck)
 
-def playersCards(cardDeck, playersHand):
-    randomCard = random.randint(0, len(cardDeck)-1)
+#Adds a new card to the players hand
+def playersCards(cardDeck, playersHand, PLAYERS_SCORE):
+    randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
     card = cardDeck[randomCard]
-    playersHand.append(card)
-    cardDeck.remove(card)
+    playersHand.append(card)                                  #Adds the random card to the players hand
+    cardDeck.remove(card)                                     #Removes the random card from the card deck
     savePlayersHand(playersHand)
     saveCardDeck(cardDeck)
 
+#Shows the players hand
 def showPlayersHand(playersHand):
     print("YOUR CARDS: ")
     for cards in playersHand:
         print(cards[0], cards[1])
     print()
 
+#Shows the dealers hand
 def showDealersHand(dealersHand):
     print("DEALER'S SHOW CARD: ")
     for cards in dealersHand:
         print(cards[0], cards[1])
     print()
 
-def main():
+#The game name and introduction
+def gameName():
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
     print()
+
+def main():
+    gameName()
 
     cardDeck = loadCardDeck()
     dealersHand = loadDealersHand()
@@ -152,10 +161,10 @@ def main():
 
     again = "y"
     while again == "y":
-        dealersCards(cardDeck, dealersHand)
+        dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
         
-        playersCards(cardDeck, playersHand)
-        playersCards(cardDeck, playersHand)
+        playersCards(cardDeck, playersHand, PLAYERS_SCORE)
+        playersCards(cardDeck, playersHand, PLAYERS_SCORE)
 
         showDealersHand(dealersHand)
         showPlayersHand(playersHand)
@@ -164,11 +173,11 @@ def main():
             playerChoice = input("Hit or stand? (hit/stand): ")
             print()
             if playerChoice == "hit":
-                playersCards(cardDeck, playersHand)
+                playersCards(cardDeck, playersHand, PLAYERS_SCORE)
                 showPlayersHand(playersHand)
 
             elif playerChoice == "stand":
-                dealersCards(cardDeck, dealersHand)
+                dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
                 showDealersHand(dealersHand)
                 break
 
@@ -176,6 +185,10 @@ def main():
                 print("'" +playerChoice+ "'" + " is not a proprer command." + " Please enter hit or stand.")
                 print()
                 continue
+            
+        print("YOUR POINTS:     " + str(PLAYERS_SCORE))
+        print("DEALER'S POINTS: " + str(DEALERS_SCORE))
+        print()
 
         again = input("Play again? (y/n): ")
 
