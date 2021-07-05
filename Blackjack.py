@@ -115,31 +115,31 @@ def saveCardDeck(cardDeck):
 
 def dealersCards(cardDeck, dealersHand):
     randomCard = random.randint(0, len(cardDeck)-1)
-    firstCard = cardDeck[randomCard]
-    dealersHand.append(firstCard)
-    cardDeck.remove(firstCard)
-    secondCard = cardDeck[randomCard]
-    dealersHand.append(secondCard)
-    cardDeck.remove(secondCard)
+    card = cardDeck[randomCard]
+    dealersHand.append(card)
+    cardDeck.remove(card)
     saveDealersHand(dealersHand)
     saveCardDeck(cardDeck)
-    print(firstCard[0], firstCard[1])
-    print()
 
 def playersCards(cardDeck, playersHand):
     randomCard = random.randint(0, len(cardDeck)-1)
-    firstCard = cardDeck[randomCard]
-    playersHand.append(firstCard)
-    cardDeck.remove(firstCard)
-    secondCard = cardDeck[randomCard]
-    playersHand.append(secondCard)
-    cardDeck.remove(secondCard)
+    card = cardDeck[randomCard]
+    playersHand.append(card)
+    cardDeck.remove(card)
     savePlayersHand(playersHand)
     saveCardDeck(cardDeck)
-    print(firstCard[0], firstCard[1])
-    print(secondCard[0], secondCard[1])
+
+def showPlayersHand(playersHand):
+    print("YOUR CARDS: ")
+    for cards in playersHand:
+        print(cards[0], cards[1])
     print()
 
+def showDealersHand(dealersHand):
+    print("DEALER'S SHOW CARD: ")
+    for cards in dealersHand:
+        print(cards[0], cards[1])
+    print()
 
 def main():
     print("BLACKJACK!")
@@ -152,23 +152,29 @@ def main():
 
     again = "y"
     while again == "y":
-
-        print("DEALER'S SHOW CARD: ")
         dealersCards(cardDeck, dealersHand)
-
-        print("YOUR CARDS: ")
+        
         playersCards(cardDeck, playersHand)
+        playersCards(cardDeck, playersHand)
+
+        showDealersHand(dealersHand)
+        showPlayersHand(playersHand)
 
         while True:
             playerChoice = input("Hit or stand? (hit/stand): ")
+            print()
             if playerChoice == "hit":
-                break
+                playersCards(cardDeck, playersHand)
+                showPlayersHand(playersHand)
 
             elif playerChoice == "stand":
+                dealersCards(cardDeck, dealersHand)
+                showDealersHand(dealersHand)
                 break
 
             else:
-                print("Please enter a proper command.")
+                print("'" +playerChoice+ "'" + " is not a proprer command." + " Please enter hit or stand.")
+                print()
                 continue
 
         again = input("Play again? (y/n): ")
