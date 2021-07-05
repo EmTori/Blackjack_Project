@@ -28,7 +28,7 @@ def loadDealersHand():
         return dealersHand
     except FileNotFoundError as e:            #If the program cant find the dealers hand file it will creat a new, empty, file
         print("Could not find file: " +DEALERS_HAND_FILENAME+ "!")
-        print("Starting new file...")
+        print("Starting a new empty file...")
         print()
         return dealersHand
     except Exception as e:
@@ -37,9 +37,16 @@ def loadDealersHand():
 
 #Saves the dealers hand file
 def saveDealersHand(dealersHand):
-    with open(DEALERS_HAND_FILENAME, "w", newline = "") as file:
-        writer = csv.writer(file)
-        writer.writerows(dealersHand)
+    try:
+        with open(DEALERS_HAND_FILENAME, "w", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerows(dealersHand)
+    except OSError as e:
+        print(type(e), e)
+        exit_program()
+    except Exception as e:
+        print(type(e), e)
+        exit_program()
 
 #Loads the Player hand file
 def loadPlayersHand():
@@ -53,7 +60,7 @@ def loadPlayersHand():
         return playersHand
     except FileNotFoundError as e:            #If the program cant find the players hand file it will creat a new, empty, file
         print("Could not find file: " +PLAYERS_HAND_FILENAME+ "!")
-        print("Starting new file...")
+        print("Starting a new empty file...")
         print()
         return playersHand
     except Exception as e:
@@ -62,9 +69,16 @@ def loadPlayersHand():
 
 #Saves the Player hand file
 def savePlayersHand(playersHand):
-    with open(PLAYERS_HAND_FILENAME, "w", newline = "") as file:
-        writer = csv.writer(file)
-        writer.writerows(playersHand)
+    try:
+        with open(PLAYERS_HAND_FILENAME, "w", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerows(playersHand)
+    except OSError as e:
+        print(type(e), e)
+        exit_program()
+    except Exception as e:
+        print(type(e), e)
+        exit_program()
 
 #Loads the deck of cards file
 def loadCardDeck():
@@ -85,9 +99,28 @@ def loadCardDeck():
 
 #Saves the deck of cards file
 def saveCardDeck(cardDeck):
-    with open(DECK_FILENAME, "w", newline = "") as file:
-        writer = csv.writer(file)
-        writer.writerows(cardDeck)
+    try:
+        with open(DECK_FILENAME, "w", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerows(cardDeck)
+    except OSError as e:
+        print(type(e), e)
+        exit_program()
+    except Exception as e:
+        print(type(e), e)
+        exit_program()
+
+def dealersCards(cardDeck, dealersHand):
+    randomCard = random.randint(0, len(cardDeck)-1)
+    card = cardDeck[randomCard]
+    dealersHand.append(card)
+    cardDeck.remove(card)
+    saveDealersHand(dealersHand)
+    saveCardDeck(cardDeck)
+    print(card[0], card[1])
+
+def playersCards():
+    pass
 
 def main():
     print("BLACKJACK!")
@@ -102,6 +135,7 @@ def main():
     while again == "y":
 
         print("DEALER'S SHOW CARD: ")
+        dealersCards(cardDeck, dealersHand)
 
 
         again = input("Play again? (y/n): ")
