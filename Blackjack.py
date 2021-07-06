@@ -148,25 +148,75 @@ def showDealersHand(dealersHand):
         print(cards[0], cards[1])
     print()
 
-def playerBet(playersMoney):
-    playersMoney = float(playersMoney[0][0])
-    print("Money: " + str(playersMoney))
+#---------------------------------------------------------------------------------------------------------------------------------------------#
+##def playerBet(playersMoney):
+##     money = float(playersMoney[0][0])
+##     print("Money: " + str(money))
+##     while True:
+##         betAmount = int(input("Bet amount: "))
+##
+##         if betAmount < 5 and betAmount > 1000:
+##             print("Bet amount cannot be less than 5 and greater than 1000.")
+##             continue
+##
+##         elif betAmount > money:
+##             print("You cannot bet more money than you have available.")
+##             continue
+##        
+##         else:
+##             money -= betAmount
+##             playersMoney.append(money)
+##             saveMoney(playersMoney)
+##             print("Money: " + str(money))
+##             break
+
+#Loads the deck of cards file
+def loadMoney():
+    try:
+        playersMoney = []
+        with open("money.txt", "r", newline = "") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                money = [row[0]]
+                playersMoney.append(money)
+        return playersMoney
+    except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
+        print("Could not find file: money.txt!")
+        exitProgram()
+    except Exception as e:                                    #Exception error will end the program
+        print(type(e), e)
+        exitProgram()
+
+#Saves the deck of cards file
+def saveMoney(playersMoney):
+    try:
+        with open("money.txt", "w", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerows(playersMoney)
+    except OSError as e:                                      #OS error will end the program
+        print(type(e), e)
+        exitProgram()
+    except Exception as e:                                    #Exception error will end the program
+        print(type(e), e)
+        exitProgram()
+
+def betMoney(playersMoney):
+    print("Money: ", playersMoney[0][0])
     while True:
-        betAmount = int(input("Bet amount: "))
-
-        if betAmount < 5 and betAmount > 1000:
-            print("Bet amount cannot be less than 5 and greater than 1000.")
+        playerBet = int(input("Bet amount: "))
+        if playerBet < 5 and playerBet > 1000:
+            print("Player bet must be between 5 and 1000.")
             continue
-
-        elif betAmount > playersMoney:
-            print("You cannot bet more money than you have available.")
+        elif playerBet > int(playersMoney[0][0]):
+            print("You cannot bet more money than you have.")
             continue
-        
-        else:
-            playersMoney -= betAmount
-            db.saveMoney(playersMoney)
-            print("Money: " + str(playersMoney))
+        elif playerBet <= int(playersMoney[0][0]):
+            money = int(playersMoney[0][0])
+            money -= playerBet
+            playersMoney.append(money)
+            saveMoney(playersMoney)
             break
+#---------------------------------------------------------------------------------------------------------------------------------------------#   
 
 #The game name and introduction
 def gameName():
@@ -181,12 +231,19 @@ def main():
     cardDeck = loadCardDeck()
     dealersHand = loadDealersHand()
     playersHand = loadPlayersHand()
-    playersMoney = db.loadMoney()
+
+#---------------------------------------------------------------------------------------------------------------------------------------------#
+    #playersMoney = db.loadMoney()
+    playersMoney = loadMoney()
+#---------------------------------------------------------------------------------------------------------------------------------------------#
 
     again = "y"
     while again == "y":
 
-        playerBet(playersMoney)
+#---------------------------------------------------------------------------------------------------------------------------------------------#
+        #playerBet(playersMoney)
+        betMoney(playersMoney)
+#---------------------------------------------------------------------------------------------------------------------------------------------#
 
         dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
         
@@ -202,6 +259,7 @@ def main():
             if playerChoice == "hit":
                 playersCards(cardDeck, playersHand, PLAYERS_SCORE)
                 showPlayersHand(playersHand)
+                continue
 
             elif playerChoice == "stand":
                 dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
