@@ -3,8 +3,8 @@
 import csv
 import random
 import sys
-
-import db
+import os
+import time
 
 #File names in the current directory
 DECK_FILENAME = "Card_Deck.csv"
@@ -33,9 +33,9 @@ def loadDealersHand():
                 dealersHand.append(card)
         return dealersHand
     except FileNotFoundError as e:                            #If the program cant find the dealers hand file it will creat a new one
-        print("Could not find file: " +DEALERS_HAND_FILENAME+ "!")
-        print("Starting a new empty file...")
-        print()
+##        print("Could not find file: " +DEALERS_HAND_FILENAME+ "!")
+##        print("Starting a new empty file...")
+##        print()
         return dealersHand
     except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
@@ -65,9 +65,9 @@ def loadPlayersHand():
                 playersHand.append(card)
         return playersHand
     except FileNotFoundError as e:                            #If the program cant find the players hand file it will creat a new one
-        print("Could not find file: " +PLAYERS_HAND_FILENAME+ "!")
-        print("Starting a new empty file...")
-        print()
+##        print("Could not find file: " +PLAYERS_HAND_FILENAME+ "!")
+##        print("Starting a new empty file...")
+##        print()
         return playersHand
     except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
@@ -98,6 +98,7 @@ def loadCardDeck():
         return cardDeck
     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
         print("Could not find file: " +DECK_FILENAME+ "!")
+        #return cardDeck
         exitProgram()
     except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
@@ -117,7 +118,7 @@ def saveCardDeck(cardDeck):
         exitProgram()
 
 #Adds a new card to the dealers hand
-def dealersCards(cardDeck, dealersHand, DEALERS_SCORE):
+def dealersCards(cardDeck, dealersHand):
     randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
     card = cardDeck[randomCard]
     dealersHand.append(card)                                  #Adds the random card to the dealers hand
@@ -126,7 +127,7 @@ def dealersCards(cardDeck, dealersHand, DEALERS_SCORE):
     saveCardDeck(cardDeck)
 
 #Adds a new card to the players hand
-def playersCards(cardDeck, playersHand, PLAYERS_SCORE):
+def playersCards(cardDeck, playersHand):
     randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
     card = cardDeck[randomCard]
     playersHand.append(card)                                  #Adds the random card to the players hand
@@ -147,6 +148,24 @@ def showDealersHand(dealersHand):
     for cards in dealersHand:
         print(cards[0], cards[1])
     print()
+
+#Clears the card deck and remakes it, shuffling the deck
+def shuffleDeck(cardDeck):
+    cardDeck.clear()
+    suits = ['of Hearts', 'of Clubs', 'of Diamonds', 'of Spades']
+    cards = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+    values = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+
+    for c, v in zip(cards, values):
+        for s in suits:
+            deck = [c, s, v] 
+            cardDeck.append(deck)
+            saveCardDeck(cardDeck)
+
+#Delets the player hand file and the dealers hand file
+def removeExtraCards():
+    os.remove(DEALERS_HAND_FILENAME)
+    os.remove(PLAYERS_HAND_FILENAME)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------#
 ##def playerBet(playersMoney):
@@ -170,52 +189,52 @@ def showDealersHand(dealersHand):
 ##             print("Money: " + str(money))
 ##             break
 
-#Loads the deck of cards file
-def loadMoney():
-    try:
-        playersMoney = []
-        with open("money.txt", "r", newline = "") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                money = [row[0]]
-                playersMoney.append(money)
-        return playersMoney
-    except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
-        print("Could not find file: money.txt!")
-        exitProgram()
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
+# #Loads the deck of cards file
+# def loadMoney():
+#     try:
+#         playersMoney = []
+#         with open("money.txt", "r", newline = "") as file:
+#             reader = csv.reader(file)
+#             for row in reader:
+#                 money = [row[0]]
+#                 playersMoney.append(money)
+#         return playersMoney
+#     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
+#         print("Could not find file: money.txt!")
+#         exitProgram()
+#     except Exception as e:                                    #Exception error will end the program
+#         print(type(e), e)
+#         exitProgram()
 
-#Saves the deck of cards file
-def saveMoney(playersMoney):
-    try:
-        with open("money.txt", "w", newline = "") as file:
-            writer = csv.writer(file)
-            writer.writerows(playersMoney)
-    except OSError as e:                                      #OS error will end the program
-        print(type(e), e)
-        exitProgram()
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
+# #Saves the deck of cards file
+# def saveMoney(playersMoney):
+#     try:
+#         with open("money.txt", "w", newline = "") as file:
+#             writer = csv.writer(file)
+#             writer.writerows(playersMoney)
+#     except OSError as e:                                      #OS error will end the program
+#         print(type(e), e)
+#         exitProgram()
+#     except Exception as e:                                    #Exception error will end the program
+#         print(type(e), e)
+#         exitProgram()
 
-def betMoney(playersMoney):
-    print("Money: ", playersMoney[0][0])
-    while True:
-        playerBet = int(input("Bet amount: "))
-        if playerBet < 5 and playerBet > 1000:
-            print("Player bet must be between 5 and 1000.")
-            continue
-        elif playerBet > int(playersMoney[0][0]):
-            print("You cannot bet more money than you have.")
-            continue
-        elif playerBet <= int(playersMoney[0][0]):
-            money = int(playersMoney[0][0])
-            money -= playerBet
-            playersMoney.append(money)
-            saveMoney(playersMoney)
-            break
+# def betMoney(playersMoney):
+#     print("Money: ", playersMoney[0][0])
+#     while True:
+#         playerBet = int(input("Bet amount: "))
+#         if playerBet < 5 and playerBet > 1000:
+#             print("Player bet must be between 5 and 1000.")
+#             continue
+#         elif playerBet > int(playersMoney[0][0]):
+#             print("You cannot bet more money than you have.")
+#             continue
+#         elif playerBet <= int(playersMoney[0][0]):
+#             money = int(playersMoney[0][0])
+#             money -= playerBet
+#             playersMoney.append(money)
+#             saveMoney(playersMoney)
+#             break
 #---------------------------------------------------------------------------------------------------------------------------------------------#   
 
 #The game name and introduction
@@ -234,7 +253,7 @@ def main():
 
 #---------------------------------------------------------------------------------------------------------------------------------------------#
     #playersMoney = db.loadMoney()
-    playersMoney = loadMoney()
+    #playersMoney = loadMoney()
 #---------------------------------------------------------------------------------------------------------------------------------------------#
 
     again = "y"
@@ -242,13 +261,18 @@ def main():
 
 #---------------------------------------------------------------------------------------------------------------------------------------------#
         #playerBet(playersMoney)
-        betMoney(playersMoney)
+        #betMoney(playersMoney)
 #---------------------------------------------------------------------------------------------------------------------------------------------#
 
-        dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
+        shuffleDeck(cardDeck)
+        print("Dealer is shuffling the deck...")
+        print()
+        time.sleep(1.5)
+
+        dealersCards(cardDeck, dealersHand)
         
-        playersCards(cardDeck, playersHand, PLAYERS_SCORE)
-        playersCards(cardDeck, playersHand, PLAYERS_SCORE)
+        playersCards(cardDeck, playersHand)
+        playersCards(cardDeck, playersHand)
 
         showDealersHand(dealersHand)
         showPlayersHand(playersHand)
@@ -257,12 +281,12 @@ def main():
             playerChoice = input("Hit or stand? (hit/stand): ")
             print()
             if playerChoice == "hit":
-                playersCards(cardDeck, playersHand, PLAYERS_SCORE)
+                playersCards(cardDeck, playersHand)
                 showPlayersHand(playersHand)
                 continue
 
             elif playerChoice == "stand":
-                dealersCards(cardDeck, dealersHand, DEALERS_SCORE)
+                dealersCards(cardDeck, dealersHand)
                 showDealersHand(dealersHand)
                 break
 
@@ -275,11 +299,17 @@ def main():
         print("DEALER'S POINTS: " + str(DEALERS_SCORE))
         print()
 
-        again = input("Play again? (y/n): ")
+        shuffleDeck(cardDeck)
+        dealersHand.clear()
+        playersHand.clear()
 
-    print()
+        again = input("Play again? (y/n): ")
+        print()
+
     print("Come back soon!")
     print("Bye!")
+
+    removeExtraCards()
 
 if __name__ == "__main__":
     main()
