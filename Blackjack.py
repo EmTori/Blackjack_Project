@@ -297,7 +297,6 @@ def main():
             
         print("YOUR POINTS:     " + str(PLAYERS_SCORE))
         print("DEALER'S POINTS: " + str(DEALERS_SCORE))
-        print()
 
         shuffleDeck(cardDeck)
         dealersHand.clear()
