@@ -1,19 +1,9 @@
-#!/usr/bin/env python3
-
 import csv
-import random
+from random import shuffle
 import sys
 import os
-import time
 
-#File names in the current directory
 DECK_FILENAME = "Card_Deck.csv"
-DEALERS_HAND_FILENAME = "Dealers_Hand.csv"
-PLAYERS_HAND_FILENAME = "Players_Hand.csv"
-
-#Game score
-DEALERS_SCORE = 0
-PLAYERS_SCORE = 0
 
 #Exits program if something fails
 def exitProgram():
@@ -22,89 +12,24 @@ def exitProgram():
     print("Bye!")
     sys.exit()
 
-#Loads the dealers hand file
-def loadDealersHand():
-    try:
-        dealersHand = []
-        with open(DEALERS_HAND_FILENAME, "r", newline = "") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                card = [row[0], row[1]]
-                dealersHand.append(card)
-        return dealersHand
-    except FileNotFoundError as e:                            #If the program cant find the dealers hand file it will creat a new one
-##        print("Could not find file: " +DEALERS_HAND_FILENAME+ "!")
-##        print("Starting a new empty file...")
-##        print()
-        return dealersHand
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
-
-#Saves the dealers hand file
-def saveDealersHand(dealersHand):
-    try:
-        with open(DEALERS_HAND_FILENAME, "w", newline = "") as file:
-            writer = csv.writer(file)
-            writer.writerows(dealersHand)
-    except OSError as e:                                      #OS error will end the program
-        print(type(e), e)
-        exitProgram()
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
-
-#Loads the Player hand file
-def loadPlayersHand():
-    try:
-        playersHand = []
-        with open(PLAYERS_HAND_FILENAME, "r", newline = "") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                card = [row[0], row[1]]
-                playersHand.append(card)
-        return playersHand
-    except FileNotFoundError as e:                            #If the program cant find the players hand file it will creat a new one
-##        print("Could not find file: " +PLAYERS_HAND_FILENAME+ "!")
-##        print("Starting a new empty file...")
-##        print()
-        return playersHand
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
-
-#Saves the Player hand file
-def savePlayersHand(playersHand):
-    try:
-        with open(PLAYERS_HAND_FILENAME, "w", newline = "") as file:
-            writer = csv.writer(file)
-            writer.writerows(playersHand)
-    except OSError as e:                                      #OS error will end the program
-        print(type(e), e)
-        exitProgram()
-    except Exception as e:                                    #Exception error will end the program
-        print(type(e), e)
-        exitProgram()
-
-#Loads the deck of cards file
+#Load the card deck file
 def loadCardDeck():
     try:
         cardDeck = []
         with open(DECK_FILENAME, "r", newline = "") as file:
             reader = csv.reader(file)
             for row in reader:
-                card = [row[0], row[1], row[2]]
+                card = [row[0], row[1]]
                 cardDeck.append(card)
         return cardDeck
     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
-        print("Could not find file: " +DECK_FILENAME+ "!")
-        #return cardDeck
+        print("Could not find file " +DECK_FILENAME+ "!")
         exitProgram()
     except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
 
-#Saves the deck of cards file
+#Save the card deck file
 def saveCardDeck(cardDeck):
     try:
         with open(DECK_FILENAME, "w", newline = "") as file:
@@ -117,127 +42,90 @@ def saveCardDeck(cardDeck):
         print(type(e), e)
         exitProgram()
 
-#Adds a new card to the dealers hand
-def dealersCards(cardDeck, dealersHand):
-    randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
-    card = cardDeck[randomCard]
-    dealersHand.append(card)                                  #Adds the random card to the dealers hand
-    cardDeck.remove(card)                                     #Removes the random card from the card deck
-    saveDealersHand(dealersHand)
-    saveCardDeck(cardDeck)
+#Assigning values to the cards in the deck
+def score(cardDeck, hand):
+    score = 0
+    if cardDeck == ("10", "Jack", "Queen", "King"):        #Assigns a score of 10 to the 10, Jack, Queen, and King cards
+        score += 10
+    elif cardDeck == ("3", "4", "5", "6", "7", "8", "9"):  #Assigns a score of that matches to all the card numbers
+        score += int(cardDeck)
+    elif cardDeck == ("Ace"):                              #Assigns a score of 1 or 11 Ace cards
+        while True:
+            aceChoice = input("Do you want the Ace to be 1 or 11: ")
+            if aceChoice == "1":                              #Player chooses 1
+                score += 1                                     #Score is set to 1
+                break
+            elif aceChoice == "11":                           #Player chooses 11
+                score += 11                                    #Score is set to 11
+                break
+            else:                                             #Player enters invalid choice
+                print("Invalid choice. Please enter '1' or '11'.")
+                continue
+    return score
 
-#Adds a new card to the players hand
-def playersCards(cardDeck, playersHand):
-    randomCard = random.randint(0, len(cardDeck)-1)           #Gets a random card from the card deck
-    card = cardDeck[randomCard]
-    playersHand.append(card)                                  #Adds the random card to the players hand
-    cardDeck.remove(card)                                     #Removes the random card from the card deck
-    savePlayersHand(playersHand)
-    saveCardDeck(cardDeck)
+#Shuffles and deals the 2 first cards to both the player and dealer
+def dealCards(cardDeck, playerHand, dealerHand):
+    shuffle(cardDeck)                                         #Shuffles card deck
+    
+    for i in range(2):                                        #A for loop that adds 2 cards to the players hand
+        playerHand.append(cardDeck.pop())
+    dealerHand.append(cardDeck.pop())                         #Adds 1 card to the dealers hand
 
-#Shows the players hand
-def showPlayersHand(playersHand):
-    print("YOUR CARDS: ")
-    for cards in playersHand:
-        print(cards[0], cards[1])
-    print()
+#Player chooses hit or stand   
+def hitOrStand(cardDeck, playerHand, dealerHand, hit, stand):
+    while True:                                               #
+        playerChoice = input("Hit or stand? (hit/stand): ")
+        print()
+        
+        if playerChoice.lower() == "hit":                     #Player chooses hit
+            hit = True                                        #Hit set to true
+            playerHand.append(cardDeck.pop())                 #Adds card to player hand
+            displayCards(playerHand, dealerHand, hit, stand)
+            continue
+            
+        elif playerChoice.lower() == "stand":                 #Player chooses stand
+            stand = True                                      #stand set to true
+            dealerHand.append(cardDeck.pop())
+            displayCards(playerHand, dealerHand, hit, stand)
+            break
+            
+        else:                                                 #Player enters invalid choice
+            print("'" +playerChoice+ "'" +
+                  " is not a proprer command." +
+                  " Please enter hit or stand.")
+            print()
+            continue
+        
+def isGameOver(playerHand, dealerHand, score):
+    pass    
 
-#Shows the dealers hand
-def showDealersHand(dealersHand):
-    print("DEALER'S SHOW CARD: ")
-    for cards in dealersHand:
-        print(cards[0], cards[1])
-    print()
+#Show the dealers and players hand
+def displayCards(playerHand, dealerHand, hit, stand):
+    if hit == False and stand == False:                       #If hit and stand is false, print dealers and players hands
+        print("DEALER'S SHOW CARD: ")
+        for cards in dealerHand:                              #A for loop that shows all cards in dealers hand
+            print(cards[0], cards[1])
+        print("???")
+        print()
+        
+        print("YOUR CARDS: ")
+        for cards in playerHand:                              #A for loop that shows all cards in players hand
+            print(cards[0], cards[1])
+        print() 
 
-#Clears the card deck and remakes it, shuffling the deck
-def shuffleDeck(cardDeck):
-    cardDeck.clear()
-    suits = ['of Hearts', 'of Clubs', 'of Diamonds', 'of Spades']
-    cards = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
-    values = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+    elif hit == True and stand == False:                      #If hit is true and stand is false, print only players hand
+        print("YOUR CARDS: ")
+        for cards in playerHand:                              #A for loop that shows all cards in players hand
+            print(cards[0], cards[1])
+        print()
 
-    for c, v in zip(cards, values):
-        for s in suits:
-            deck = [c, s, v] 
-            cardDeck.append(deck)
-            saveCardDeck(cardDeck)
-
-#Delets the player hand file and the dealers hand file
-def removeExtraCards():
-    os.remove(DEALERS_HAND_FILENAME)
-    os.remove(PLAYERS_HAND_FILENAME)
-
-#---------------------------------------------------------------------------------------------------------------------------------------------#
-##def playerBet(playersMoney):
-##     money = float(playersMoney[0][0])
-##     print("Money: " + str(money))
-##     while True:
-##         betAmount = int(input("Bet amount: "))
-##
-##         if betAmount < 5 and betAmount > 1000:
-##             print("Bet amount cannot be less than 5 and greater than 1000.")
-##             continue
-##
-##         elif betAmount > money:
-##             print("You cannot bet more money than you have available.")
-##             continue
-##        
-##         else:
-##             money -= betAmount
-##             playersMoney.append(money)
-##             saveMoney(playersMoney)
-##             print("Money: " + str(money))
-##             break
-
-# #Loads the deck of cards file
-# def loadMoney():
-#     try:
-#         playersMoney = []
-#         with open("money.txt", "r", newline = "") as file:
-#             reader = csv.reader(file)
-#             for row in reader:
-#                 money = [row[0]]
-#                 playersMoney.append(money)
-#         return playersMoney
-#     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
-#         print("Could not find file: money.txt!")
-#         exitProgram()
-#     except Exception as e:                                    #Exception error will end the program
-#         print(type(e), e)
-#         exitProgram()
-
-# #Saves the deck of cards file
-# def saveMoney(playersMoney):
-#     try:
-#         with open("money.txt", "w", newline = "") as file:
-#             writer = csv.writer(file)
-#             writer.writerows(playersMoney)
-#     except OSError as e:                                      #OS error will end the program
-#         print(type(e), e)
-#         exitProgram()
-#     except Exception as e:                                    #Exception error will end the program
-#         print(type(e), e)
-#         exitProgram()
-
-# def betMoney(playersMoney):
-#     print("Money: ", playersMoney[0][0])
-#     while True:
-#         playerBet = int(input("Bet amount: "))
-#         if playerBet < 5 and playerBet > 1000:
-#             print("Player bet must be between 5 and 1000.")
-#             continue
-#         elif playerBet > int(playersMoney[0][0]):
-#             print("You cannot bet more money than you have.")
-#             continue
-#         elif playerBet <= int(playersMoney[0][0]):
-#             money = int(playersMoney[0][0])
-#             money -= playerBet
-#             playersMoney.append(money)
-#             saveMoney(playersMoney)
-#             break
-#---------------------------------------------------------------------------------------------------------------------------------------------#   
-
-#The game name and introduction
+    else:                                                     #Anything else, print only dealers hand
+        print("DEALER'S SHOW CARD: ")
+        for cards in dealerHand:                              #A for loop that shows all cards in dealers hand
+            print(cards[0], cards[1])
+        print()
+        
+#Blackjack intoduction        
 def gameName():
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
@@ -246,69 +134,31 @@ def gameName():
 #Main function
 def main():
     gameName()
-
     cardDeck = loadCardDeck()
-    dealersHand = loadDealersHand()
-    playersHand = loadPlayersHand()
+    playerHand = []
+    dealerHand = []
 
-#---------------------------------------------------------------------------------------------------------------------------------------------#
-    #playersMoney = db.loadMoney()
-    #playersMoney = loadMoney()
-#---------------------------------------------------------------------------------------------------------------------------------------------#
+    hitting = False
+    standing = False
 
     again = "y"
-    while again == "y":
+    while again.lower() == "y":                               #While loop for replaying game
+        dealCards(cardDeck, playerHand, dealerHand)
+        displayCards(playerHand, dealerHand, hitting, standing)
+        hitOrStand(cardDeck, playerHand, dealerHand, hitting, standing)
 
-#---------------------------------------------------------------------------------------------------------------------------------------------#
-        #playerBet(playersMoney)
-        #betMoney(playersMoney)
-#---------------------------------------------------------------------------------------------------------------------------------------------#
-
-        shuffleDeck(cardDeck)
-        print("Dealer is shuffling the deck...")
+        print("YOUR POINTS:     " +str(score(cardDeck, playerHand)))
+        print("DEALER'S POINTS: " +str(score(cardDeck, dealerHand)))
         print()
-        time.sleep(1.5)
 
-        dealersCards(cardDeck, dealersHand)
+        playerHand.clear()                                    #Clears players hand
+        dealerHand.clear()                                    #Clears dealers hand
         
-        playersCards(cardDeck, playersHand)
-        playersCards(cardDeck, playersHand)
-
-        showDealersHand(dealersHand)
-        showPlayersHand(playersHand)
-
-        while True:
-            playerChoice = input("Hit or stand? (hit/stand): ")
-            print()
-            if playerChoice == "hit":
-                playersCards(cardDeck, playersHand)
-                showPlayersHand(playersHand)
-                continue
-
-            elif playerChoice == "stand":
-                dealersCards(cardDeck, dealersHand)
-                showDealersHand(dealersHand)
-                break
-
-            else:
-                print("'" +playerChoice+ "'" + " is not a proprer command." + " Please enter hit or stand.")
-                print()
-                continue
-            
-        print("YOUR POINTS:     " + str(PLAYERS_SCORE))
-        print("DEALER'S POINTS: " + str(DEALERS_SCORE))
-
-        shuffleDeck(cardDeck)
-        dealersHand.clear()
-        playersHand.clear()
-
         again = input("Play again? (y/n): ")
         print()
-
+        
     print("Come back soon!")
     print("Bye!")
-
-    removeExtraCards()
 
 if __name__ == "__main__":
     main()
