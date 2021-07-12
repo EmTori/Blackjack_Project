@@ -10,6 +10,7 @@ import db
 
 #Card deck file name
 DECK_FILENAME = "Card_Deck.csv"
+MONEY_FILENAME = "money.txt"
 
 #Exits program if something fails
 def exitProgram():
@@ -17,10 +18,6 @@ def exitProgram():
     print()
     print("Bye!")
     sys.exit()
-
-def betMoney():
-    pass
-    
 
 #Load the card deck file
 def loadCardDeck():
@@ -51,7 +48,87 @@ def saveCardDeck(cardDeck):
     except Exception as e:                                    #Exception error will end the program
         print(type(e), e)
         exitProgram()
+        
+#The player is running out of money/ chips and needs to get more        
+def notEnoughMoney(money):
+    if float(money[0][0]) > 5 and float(money[0][0]) <= 10:   #
+        print("You are running low on chips")
+        moreChips = input("Would you like to buy more? (y/n): ")
+        print()
+        if moreChips.lower() == "y":                          #
+            while True:                                       #
+                try:
+                    chipAmount = int(input("How many chips do you want? ($5 - $1,000): "))
+                except ValueError:                            #
+                    print("Invalid integer, plaese try again")
+                    print()
+                except Exception as e:                        #
+                    print("Unexpected exception, plaese try again")
+                    print(type(e), e)
+                    print()
+                if chipAmount < 5 or chipAmount > 1000:       #
+                    print("Please choose an amount between $5 and $1,000.")
+                    print()
+                    continue
+                else:                                         #
+                    print("$" +str(chipAmount)+ " has been added to your funds.")
+                    print()
+                    break
+        else:                                                 #
+            print("Warning! If your funds get much lower you will no longer be able to play.")
+            print()
+                        
+    elif float(money[0][0]) <= 5:
+        print("You are low on chips, and now need to buy more.")
+        print()
+        while True:
+                try:
+                    chipAmount = int(input("How many chips do you want? $5 - $1,000: "))
+                except ValueError:
+                    print("Invalid integer, plaese try again")
+                    print()
+                except Exception as e:
+                    print("Unexpected exception, plaese try again")
+                    print(type(e), e)
+                    print()
+                if chipAmount < 5 or chipAmount > 1000:
+                    print("Please choose an amount between $5 and $1,000.")
+                    print()
+                    continue
+                else:
+                    print("$" +str(chipAmount)+ " has been added to your funds.")
+                    print()
+                    break
 
+#The player will bet money on their game       
+def betMoney(money):
+    print("Money: ", str(money[0][0]))
+    while True:                                               #
+        try:
+            playersBet = float(input("Bet amount: "))         #
+        except ValueError:                                    #
+            print("Invalid number, try again")
+            print()
+        except Exception as e:                                #
+            print("Unexpected exception, try again")
+            print(type(e), e)
+            print()
+        if playersBet < 5 or playersBet > 1000:               #
+            print("You may only bet between $5 and $1,000.")
+            print()
+            continue
+        if playersBet > float(money[0][0]):                   #
+            print("You cannot bet more money than you have available to you.")
+            print()
+            continue
+        else:                                                 #
+            newMoney = float(money[0][0]) - float(playersBet)
+            print("Money: ", str(newMoney))
+            money.clear()
+            money.append(int(newMoney))
+            db.saveMoney(money)
+            break
+        
 #Assigning values to the cards in the deck
 def getScore(hand):
     total = 0                                                 #Total score in hand
@@ -65,6 +142,7 @@ def getScore(hand):
         if numberOfAces >= 1:                                 #If number of aces is more than 1
             if total > 21:                                    #And total score is more than 21
                 total -= 10                                   #Subtract 10 off of score
+                numberOfAces -= 1
     return total
 
 #Shuffles and deals the 2 first cards to both the player and dealer
@@ -90,14 +168,16 @@ def hitOrStand(cardDeck, playerHand, dealerHand, hit, stand, hand):
             
         elif playerChoice.lower() == "stand":                 #Player chooses stand
             stand = True                                      #Stand is set to true
-            while getScore(dealerHand) < 17:                  #If dealers score is below 17, they draw another card
-                print("The dealer is drawing another card")
+            hit = False
+            displayCards(playerHand, dealerHand, hit, stand)
+            while getScore(dealerHand) <= 16:                 #If dealers score is below 17, they draw another card
+                print("The dealer is drawing another card...")
                 print()
                 time.sleep(1)                                 #1 second wait to give the illusion of dealer drawing another card
                 dealerHand.append(cardDeck.pop())             #Adds card to dealer hand
+                displayCards(playerHand, dealerHand, hit, stand)
                 continue
-            break
-            
+            break  
         else:                                                 #Player enters invalid choice
             print("'" +playerChoice+ "'" +
                   " is not a proprer command." +
@@ -107,34 +187,28 @@ def hitOrStand(cardDeck, playerHand, dealerHand, hit, stand, hand):
 
 #Shows the games results depending on what score the player and dealer have       
 def gameResults(playerHand, dealerHand, stand, hand):
-    if getScore(playerHand) == 21 and hand == True:           #If the player gets 21, they win and get blackjack
-        print("Blackjack!")
-        print("You win! Congratulations!")
-        print()
-        
-    elif getScore(playerHand) > 21:                           #If the player gets greater than 21, they bust and lose
-        print("You busted and lose, Sorry.")
-        print()
-
-    elif getScore(dealerHand) > 21:                           #If the dealer gets greater than 21, they bust and the player wins
-        print("The dealer busted and lost.")
-        print("You win, Congratulations!")
-        print()
-
-    elif getScore(playerHand) > getScore(dealerHand):         #If the players score is greater than the dealers, the player wins
-        print("You win.")
+    if getScore(playerHand) == 21:                            #If the player gets 21, they win and get blackjack
+        print("Blackjack! You win!")
         print("Congratulations!")
-        print()
-            
-    elif getScore(dealerHand) > getScore(playerHand):         #If the dealers score is greater than the players, the dealer wins
-        print("The dealer won.")
+        isPlayerWinner = True
+    elif getScore(playerHand) > 21:                           #If the player gets greater than 21, they bust and lose
+        print("You busted, Sorry.")
+        isPlayerWinner = False
+    elif getScore(dealerHand) > 21:                           #If the dealer gets greater than 21, they bust and the player wins
+        print("Dealer busted, You win!")
+        print("Congratulations!")
+        isPlayerWinner = True
+    elif getScore(playerHand) > getScore(dealerHand):         #If the players score is greater than the dealers, the player wins 
+        print("You beat the dealer! Congratulations!")
+        isPlayerWinner = True
+    elif getScore(playerHand) < getScore(dealerHand):         #If the player score is less than the dealers, the player loses
         print("You lose, Sorry.")
-        print()
-
-    elif getScore(dealerHand) == getScore(playerHand):        #If the dealers score is the same as the players, there is a tie        
+        isPlayerWinner = False
+    else:                                                     #If the dealers score is the same as the players, there is a tie 
         print("There was a tie.")
         print("No one wins.")
-        print()       
+        isPlayerWinner = False
+    return isPlayerWinner
         
 #Show the dealers and players hand
 def displayCards(playerHand, dealerHand, hit, stand):
@@ -177,17 +251,22 @@ def gameName():
 
 #Main function
 def main():
-    cardDeck = loadCardDeck()
+    cardDeck = loadCardDeck()                                 #Load card deck
     playerHand = []
     dealerHand = []
+
+    money = db.loadMoney()                                    #Load money file from another python module
 
     hitting = False
     standing = False
     firstHand = True
-
+    
     again = "y"
     while again.lower() == "y":                               #While loop for replaying game
         gameName()
+        
+        notEnoughMoney(money)
+        betMoney(money)
 
         dealCards(cardDeck, playerHand, dealerHand)
         displayCards(playerHand, dealerHand, hitting, standing)
@@ -195,7 +274,9 @@ def main():
 
         showScores(playerHand, dealerHand)
         gameResults(playerHand, dealerHand, standing, firstHand)
-
+        
+        print("Money: ", str(money[0][0]))
+        print()
 
         playerHand.clear()                                    #Clears players hand
         dealerHand.clear()                                    #Clears dealers hand
