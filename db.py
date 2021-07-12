@@ -3,6 +3,7 @@
 import csv
 import sys
 
+#Money file name
 MONEY_FILE = "money.txt"
 
 #Function will exit the program
@@ -15,13 +16,12 @@ def exitProgram():
 #Load money file
 def loadMoney():
     try:
-        playersMoney = []
-        with open("money.txt", "r", newline = "") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                item = [row[0]]
-                playersMoney.append(item)
-        return playersMoney
+        money = []
+        with open(MONEY_FILE, "r") as file:
+            for line in file:
+                line = line.replace("\n", "")
+                money.append(line)
+        return money
     except FileNotFoundError as e:                            #If the program cant find the card deck file it will end the program
         print("Could not find file: " +MONEY_FILE+ "!")
         exitProgram()
@@ -30,11 +30,11 @@ def loadMoney():
         exitProgram()
 
 #Save money file
-def saveMoney(playersMoney):
+def saveMoney(money):
     try:
-        with open("money.txt", "w", newline = "") as file:
-            writer = csv.writer(file)
-            writer.writerows(playersMoney)
+        with open(MONEY_FILE, "w") as file:
+            for line in money:
+                file.write(line + "\n") 
     except OSError as e:                                      #OS error will end the program
         print(type(e), e)
         exitProgram()
@@ -42,18 +42,10 @@ def saveMoney(playersMoney):
         print(type(e), e)
         exitProgram()
         
+#Main function       
 def main():
-
-    playersMoney = loadMoney()
-
-    again = "y"
-    while again == "y":
-
-        print("Money: " + str(playersMoney))
-
-        playersBet = int(input("How much money do you want to bet?: "))
-
-        again = input("Bet again? (y/n): ")
+    money = loadMoney()
+    betMoney(money)
 
 if __name__ == "__main__":
     main()

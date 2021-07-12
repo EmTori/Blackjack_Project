@@ -8,7 +8,7 @@ import time
 
 import db
 
-#Card deck file name
+#Card deck and money file name
 DECK_FILENAME = "Card_Deck.csv"
 MONEY_FILENAME = "money.txt"
 
@@ -51,7 +51,7 @@ def saveCardDeck(cardDeck):
         
 #The player is running out of money/ chips and needs to get more        
 def notEnoughMoney(money):
-    if float(money[0][0]) > 5 and float(money[0][0]) <= 10:   #
+    if float(money[0]) > 5 and float(money[0]) <= 10:         #
         print("You are running low on chips")
         moreChips = input("Would you like to buy more? (y/n): ")
         print()
@@ -73,12 +73,16 @@ def notEnoughMoney(money):
                 else:                                         #
                     print("$" +str(chipAmount)+ " has been added to your funds.")
                     print()
+                    totalChips = float(money[0]) + chipAmount
+                    money.clear()
+                    money.append(str(totalChips))
+                    db.saveMoney(money)
                     break
         else:                                                 #
             print("Warning! If your funds get much lower you will no longer be able to play.")
             print()
                         
-    elif float(money[0][0]) <= 5:
+    elif float(money[0]) <= 5:
         print("You are low on chips, and now need to buy more.")
         print()
         while True:
@@ -98,11 +102,15 @@ def notEnoughMoney(money):
                 else:
                     print("$" +str(chipAmount)+ " has been added to your funds.")
                     print()
+                    totalChips = float(money[0]) + chipAmount
+                    money.clear()
+                    money.append(str(totalChips))
+                    db.saveMoney(money)
                     break
 
 #The player will bet money on their game       
 def betMoney(money):
-    print("Money: ", str(money[0][0]))
+    print("Money: " + str(money[0]))
     while True:                                               #
         try:
             playersBet = float(input("Bet amount: "))         #
@@ -113,21 +121,21 @@ def betMoney(money):
             print("Unexpected exception, try again")
             print(type(e), e)
             print()
-        if playersBet < 5 or playersBet > 1000:               #
-            print("You may only bet between $5 and $1,000.")
-            print()
-            continue
-        if playersBet > float(money[0][0]):                   #
+        if playersBet > float(money[0]):                      #
             print("You cannot bet more money than you have available to you.")
             print()
             continue
+        elif playersBet < 5 or playersBet > 1000:             #
+            print("You may only bet between $5 and $1,000.")
+            print()
+            continue
         else:                                                 #
-            newMoney = float(money[0][0]) - float(playersBet)
+            newMoney = float(money[0]) - float(playersBet)
             print("Money: ", str(newMoney))
-            money.clear()
-            money.append(int(newMoney))
+            money.clear() 
+            money.append(str(newMoney))
             db.saveMoney(money)
-            break
+            return playersBet
         
 #Assigning values to the cards in the deck
 def getScore(hand):
