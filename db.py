@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import csv
 import sys
 
 #Money file name
@@ -45,7 +44,6 @@ def saveMoney(money):
 #Main function       
 def main():
     money = loadMoney()
-    betMoney(money)
 
 if __name__ == "__main__":
     main()
